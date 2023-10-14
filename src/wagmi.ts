@@ -1,47 +1,25 @@
 import { configureChains, createConfig } from 'wagmi'
-import { foundry, goerli, mainnet } from 'wagmi/chains'
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+import { foundry } from 'wagmi/chains'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-
 import { publicProvider } from 'wagmi/providers/public'
+import { SCROLL_SEPOLIA_CHAIN } from '@/constants'
 
-const walletConnectProjectId = 'a'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
-    mainnet,
-    ...(process.env.NODE_ENV === 'development' ? [goerli, foundry] : []),
+    SCROLL_SEPOLIA_CHAIN,
+    ...(process.env.NODE_ENV === 'development' ? [foundry] : []),
   ],
   [
     publicProvider(),
   ],
 )
 
+
 export const config = createConfig({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({ chains }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: 'wagmi',
-      },
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: walletConnectProjectId,
-      },
-    }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: 'Injected',
-        shimDisconnect: true,
-      },
-    }),
   ],
   publicClient,
   webSocketPublicClient,
