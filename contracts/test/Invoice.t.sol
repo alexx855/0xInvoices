@@ -13,15 +13,17 @@ contract InvoiceTest is Test {
         emit log_address(address(invoice));
     }
 
-    function newInvoice(address ownerAddress) public {
+    function createInvoice(address ownerAddress) public {
         vm.prank(ownerAddress);
-        invoice.newInvoice(ownerAddress);
+        bytes memory encryptedData = "encryptedData";
+        bytes memory encryptedKey = "encryptedKey";
+        invoice.createInvoice(encryptedData, encryptedKey);
     }
 
     function testMint() public {
         // mint invoice to owner
         address owner = vm.addr(1);
-        newInvoice(owner);
+        createInvoice(owner);
         uint256 balance = invoice.balanceOf(owner);
         emit log_string("Balance: ");
         emit log_uint(balance);
@@ -37,7 +39,7 @@ contract InvoiceTest is Test {
         // mint invoice to owner
         address owner = vm.addr(1);
         address receiver = vm.addr(2);
-        newInvoice(owner);
+        createInvoice(owner);
         assertEq(invoice.balanceOf(owner), 1, "Token was not minted correctly");
         uint256 tokenId = invoice.tokenOfOwnerByIndex(owner, 0);
         emit log_string("Token ID: ");
@@ -51,12 +53,35 @@ contract InvoiceTest is Test {
         assertEq(tokenOwner, receiver, "Token was not transferred correctly");
     }
 
+    function testData() public {
+        address owner = vm.addr(1);
+        createInvoice(owner);
+        uint256 tokenId = invoice.tokenOfOwnerByIndex(owner, 0);
+        // it should revert with the error message caller is not the owner
+        vm.expectRevert(NotOwner.selector);
+        (
+            bytes memory revertsAsExpected,
+            bytes memory revertsAsExpectedKey
+        ) = invoice.getInvoiceData(tokenId);
+
+        // emulate owner
+        vm.prank(owner);
+        (bytes memory encryptedData, bytes memory encryptedKey) = invoice
+            .getInvoiceData(tokenId);
+        emit log_string("Encrypted data: ");
+        emit log_bytes(encryptedData);
+        emit log_string("Encrypted key: ");
+        emit log_bytes(encryptedKey);
+        assertEq(encryptedData, "encryptedData", "Wrong encrypted data");
+        assertEq(encryptedKey, "encryptedKey", "Wrong encrypted key");
+    }
+
     function testMetadata() public {
         address owner = vm.addr(1);
-        newInvoice(owner);
+        createInvoice(owner);
         uint256 tokenId = invoice.tokenOfOwnerByIndex(owner, 0);
         string memory tokenURI = invoice.tokenURI(tokenId);
-        string memory baseURI = "http://localhost:3000/metadata/";
+        string memory baseURI = invoice.getBaseInvoiceURI();
         string memory metadataURI = string(
             abi.encodePacked(baseURI, Strings.toString((tokenId)))
         );
@@ -72,7 +97,7 @@ contract InvoiceTest is Test {
     function testTransferToken() public {
         address bob = vm.addr(1);
         // mint the token to bob's address
-        invoice.newInvoice(bob);
+        createInvoice(bob);
 
         // emulate bob
         vm.startPrank(bob);
@@ -89,7 +114,7 @@ contract InvoiceTest is Test {
     // only the owner can burn
     function testBurn() public {
         address owner = vm.addr(1);
-        invoice.newInvoice(owner);
+        createInvoice(owner);
         assertEq(invoice.balanceOf(owner), 1, "Token was not minted correctly");
         uint256 tokenId = invoice.tokenOfOwnerByIndex(owner, 0);
         vm.prank(owner);
