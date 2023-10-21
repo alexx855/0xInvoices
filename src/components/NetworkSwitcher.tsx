@@ -2,6 +2,7 @@
 
 import { BaseError } from 'viem'
 import { useNetwork, useSwitchNetwork } from 'wagmi'
+import { SignOut } from './SignOut'
 
 export function NetworkSwitcher() {
   const { chain } = useNetwork()
@@ -27,6 +28,8 @@ export function NetworkSwitcher() {
           )}
         </div>
       )}
+
+      <SignOut />
 
       <div>{error && (error as BaseError).shortMessage}</div>
     </div>

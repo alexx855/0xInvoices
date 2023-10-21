@@ -3,13 +3,14 @@
 import { CONTRACT_ADDRESS } from "@/constants"
 import { invoiceABI } from "@/generated"
 import { useEffect } from "react"
-import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from "wagmi"
+import { usePrepareContractWrite, useContractWrite, useWaitForTransaction, useNetwork } from "wagmi"
 
 export function DeleteInvoiceButton({ tokenId, onDelete }:
   { tokenId: string, onDelete: (tokenId: string, result: `0x${string}`) => void }
 ) {
-
+  const { chain } = useNetwork()
   const { config, isLoading: isPrepareLoading } = usePrepareContractWrite({
+    chainId: chain?.id,
     address: CONTRACT_ADDRESS,
     abi: invoiceABI,
     functionName: 'burn',
@@ -19,7 +20,7 @@ export function DeleteInvoiceButton({ tokenId, onDelete }:
   const { write, isLoading, data } = useContractWrite(config)
 
   const { isSuccess } = useWaitForTransaction({
-    chainId: 31337,
+    chainId: chain?.id,
     hash: data?.hash,
   })
 

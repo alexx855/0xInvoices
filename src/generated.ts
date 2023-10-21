@@ -23,7 +23,7 @@ import {
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export const counterABI = [
   {
@@ -66,16 +66,16 @@ export const counterABI = [
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export const counterAddress = {
-  31337: '0x3489745eff9525CCC3d8c648102FE2cf3485e228',
-  534351: '0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234',
+  31337: '0x55027d3dBBcEA0327eF73eFd74ba0Af42A13A966',
+  534351: '0xb919a198AA539EAD877Ba25C9eb51639d6368a64',
 } as const
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export const counterConfig = {
   address: counterAddress,
@@ -2036,6 +2036,18 @@ export const invoiceABI = [
     ],
     name: 'ERC721OutOfBoundsIndex',
   },
+  { type: 'error', inputs: [], name: 'Emptyciphertext' },
+  { type: 'error', inputs: [], name: 'NotOwner' },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
   {
     type: 'event',
     anonymous: false,
@@ -2105,6 +2117,25 @@ export const invoiceABI = [
     anonymous: false,
     inputs: [
       {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'tokenId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    name: 'InvoiceCreated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: '_tokenId',
         internalType: 'uint256',
         type: 'uint256',
@@ -2112,6 +2143,25 @@ export const invoiceABI = [
       },
     ],
     name: 'MetadataUpdate',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
   },
   {
     type: 'event',
@@ -2153,10 +2203,44 @@ export const invoiceABI = [
     outputs: [],
   },
   {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [
+      { name: 'ciphertext', internalType: 'bytes', type: 'bytes' },
+      { name: 'dataHash', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'createInvoice',
+    outputs: [],
+  },
+  {
     stateMutability: 'view',
     type: 'function',
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'getApproved',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [],
+    name: 'getBaseInvoiceURI',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getInvoiceData',
+    outputs: [
+      { name: '', internalType: 'bytes', type: 'bytes' },
+      { name: '', internalType: 'bytes', type: 'bytes' },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getOwner',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
   },
   {
@@ -2177,11 +2261,11 @@ export const invoiceABI = [
     outputs: [{ name: '', internalType: 'string', type: 'string' }],
   },
   {
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
-    inputs: [{ name: 'to', internalType: 'address', type: 'address' }],
-    name: 'newInvoice',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
   },
   {
     stateMutability: 'view',
@@ -2189,6 +2273,13 @@ export const invoiceABI = [
     inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
     name: 'ownerOf',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
   },
   {
     stateMutability: 'nonpayable',
@@ -2221,6 +2312,13 @@ export const invoiceABI = [
       { name: 'approved', internalType: 'bool', type: 'bool' },
     ],
     name: 'setApprovalForAll',
+    outputs: [],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'baseURI', internalType: 'string', type: 'string' }],
+    name: 'setBaseURI',
     outputs: [],
   },
   {
@@ -2277,6 +2375,13 @@ export const invoiceABI = [
       { name: 'tokenId', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'transferFrom',
+    outputs: [],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
     outputs: [],
   },
 ] as const
@@ -2619,7 +2724,7 @@ export const testABI = [
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterRead<
   TFunctionName extends string,
@@ -2644,7 +2749,7 @@ export function useCounterRead<
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"number"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterNumber<
   TFunctionName extends 'number',
@@ -2670,7 +2775,7 @@ export function useCounterNumber<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterWrite<
   TFunctionName extends string,
@@ -2703,7 +2808,7 @@ export function useCounterWrite<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"increment"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterIncrement<
   TMode extends WriteContractMode = undefined,
@@ -2740,7 +2845,7 @@ export function useCounterIncrement<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"setNumber"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterSetNumber<
   TMode extends WriteContractMode = undefined,
@@ -2777,7 +2882,7 @@ export function useCounterSetNumber<
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function usePrepareCounterWrite<TFunctionName extends string>(
   config: Omit<
@@ -2799,7 +2904,7 @@ export function usePrepareCounterWrite<TFunctionName extends string>(
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"increment"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function usePrepareCounterIncrement(
   config: Omit<
@@ -2822,7 +2927,7 @@ export function usePrepareCounterIncrement(
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"setNumber"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function usePrepareCounterSetNumber(
   config: Omit<
@@ -2845,7 +2950,7 @@ export function usePrepareCounterSetNumber(
  * Wraps __{@link useContractEvent}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterEvent<TEventName extends string>(
   config: Omit<
@@ -2867,7 +2972,7 @@ export function useCounterEvent<TEventName extends string>(
  * Wraps __{@link useContractEvent}__ with `abi` set to __{@link counterABI}__ and `eventName` set to `"Transfer"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export function useCounterTransferEvent(
   config: Omit<
@@ -7253,6 +7358,63 @@ export function useInvoiceGetApproved<
 }
 
 /**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"getBaseInvoiceURI"`.
+ */
+export function useInvoiceGetBaseInvoiceUri<
+  TFunctionName extends 'getBaseInvoiceURI',
+  TSelectData = ReadContractResult<typeof invoiceABI, TFunctionName>,
+>(
+  config: Omit<
+    UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return useContractRead({
+    abi: invoiceABI,
+    functionName: 'getBaseInvoiceURI',
+    ...config,
+  } as UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>)
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"getInvoiceData"`.
+ */
+export function useInvoiceGetInvoiceData<
+  TFunctionName extends 'getInvoiceData',
+  TSelectData = ReadContractResult<typeof invoiceABI, TFunctionName>,
+>(
+  config: Omit<
+    UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return useContractRead({
+    abi: invoiceABI,
+    functionName: 'getInvoiceData',
+    ...config,
+  } as UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>)
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"getOwner"`.
+ */
+export function useInvoiceGetOwner<
+  TFunctionName extends 'getOwner',
+  TSelectData = ReadContractResult<typeof invoiceABI, TFunctionName>,
+>(
+  config: Omit<
+    UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return useContractRead({
+    abi: invoiceABI,
+    functionName: 'getOwner',
+    ...config,
+  } as UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>)
+}
+
+/**
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"isApprovedForAll"`.
  */
 export function useInvoiceIsApprovedForAll<
@@ -7286,6 +7448,25 @@ export function useInvoiceName<
   return useContractRead({
     abi: invoiceABI,
     functionName: 'name',
+    ...config,
+  } as UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>)
+}
+
+/**
+ * Wraps __{@link useContractRead}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"owner"`.
+ */
+export function useInvoiceOwner<
+  TFunctionName extends 'owner',
+  TSelectData = ReadContractResult<typeof invoiceABI, TFunctionName>,
+>(
+  config: Omit<
+    UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return useContractRead({
+    abi: invoiceABI,
+    functionName: 'owner',
     ...config,
   } as UseContractReadConfig<typeof invoiceABI, TFunctionName, TSelectData>)
 }
@@ -7494,28 +7675,55 @@ export function useInvoiceBurn<TMode extends WriteContractMode = undefined>(
 }
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"newInvoice"`.
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"createInvoice"`.
  */
-export function useInvoiceNewInvoice<
+export function useInvoiceCreateInvoice<
   TMode extends WriteContractMode = undefined,
 >(
   config: TMode extends 'prepared'
     ? UseContractWriteConfig<
         PrepareWriteContractResult<
           typeof invoiceABI,
-          'newInvoice'
+          'createInvoice'
         >['request']['abi'],
-        'newInvoice',
+        'createInvoice',
         TMode
-      > & { functionName?: 'newInvoice' }
-    : UseContractWriteConfig<typeof invoiceABI, 'newInvoice', TMode> & {
+      > & { functionName?: 'createInvoice' }
+    : UseContractWriteConfig<typeof invoiceABI, 'createInvoice', TMode> & {
         abi?: never
-        functionName?: 'newInvoice'
+        functionName?: 'createInvoice'
       } = {} as any,
 ) {
-  return useContractWrite<typeof invoiceABI, 'newInvoice', TMode>({
+  return useContractWrite<typeof invoiceABI, 'createInvoice', TMode>({
     abi: invoiceABI,
-    functionName: 'newInvoice',
+    functionName: 'createInvoice',
+    ...config,
+  } as any)
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"renounceOwnership"`.
+ */
+export function useInvoiceRenounceOwnership<
+  TMode extends WriteContractMode = undefined,
+>(
+  config: TMode extends 'prepared'
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof invoiceABI,
+          'renounceOwnership'
+        >['request']['abi'],
+        'renounceOwnership',
+        TMode
+      > & { functionName?: 'renounceOwnership' }
+    : UseContractWriteConfig<typeof invoiceABI, 'renounceOwnership', TMode> & {
+        abi?: never
+        functionName?: 'renounceOwnership'
+      } = {} as any,
+) {
+  return useContractWrite<typeof invoiceABI, 'renounceOwnership', TMode>({
+    abi: invoiceABI,
+    functionName: 'renounceOwnership',
     ...config,
   } as any)
 }
@@ -7575,6 +7783,33 @@ export function useInvoiceSetApprovalForAll<
 }
 
 /**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"setBaseURI"`.
+ */
+export function useInvoiceSetBaseUri<
+  TMode extends WriteContractMode = undefined,
+>(
+  config: TMode extends 'prepared'
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof invoiceABI,
+          'setBaseURI'
+        >['request']['abi'],
+        'setBaseURI',
+        TMode
+      > & { functionName?: 'setBaseURI' }
+    : UseContractWriteConfig<typeof invoiceABI, 'setBaseURI', TMode> & {
+        abi?: never
+        functionName?: 'setBaseURI'
+      } = {} as any,
+) {
+  return useContractWrite<typeof invoiceABI, 'setBaseURI', TMode>({
+    abi: invoiceABI,
+    functionName: 'setBaseURI',
+    ...config,
+  } as any)
+}
+
+/**
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"transferFrom"`.
  */
 export function useInvoiceTransferFrom<
@@ -7597,6 +7832,33 @@ export function useInvoiceTransferFrom<
   return useContractWrite<typeof invoiceABI, 'transferFrom', TMode>({
     abi: invoiceABI,
     functionName: 'transferFrom',
+    ...config,
+  } as any)
+}
+
+/**
+ * Wraps __{@link useContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"transferOwnership"`.
+ */
+export function useInvoiceTransferOwnership<
+  TMode extends WriteContractMode = undefined,
+>(
+  config: TMode extends 'prepared'
+    ? UseContractWriteConfig<
+        PrepareWriteContractResult<
+          typeof invoiceABI,
+          'transferOwnership'
+        >['request']['abi'],
+        'transferOwnership',
+        TMode
+      > & { functionName?: 'transferOwnership' }
+    : UseContractWriteConfig<typeof invoiceABI, 'transferOwnership', TMode> & {
+        abi?: never
+        functionName?: 'transferOwnership'
+      } = {} as any,
+) {
+  return useContractWrite<typeof invoiceABI, 'transferOwnership', TMode>({
+    abi: invoiceABI,
+    functionName: 'transferOwnership',
     ...config,
   } as any)
 }
@@ -7649,19 +7911,35 @@ export function usePrepareInvoiceBurn(
 }
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"newInvoice"`.
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"createInvoice"`.
  */
-export function usePrepareInvoiceNewInvoice(
+export function usePrepareInvoiceCreateInvoice(
   config: Omit<
-    UsePrepareContractWriteConfig<typeof invoiceABI, 'newInvoice'>,
+    UsePrepareContractWriteConfig<typeof invoiceABI, 'createInvoice'>,
     'abi' | 'functionName'
   > = {} as any,
 ) {
   return usePrepareContractWrite({
     abi: invoiceABI,
-    functionName: 'newInvoice',
+    functionName: 'createInvoice',
     ...config,
-  } as UsePrepareContractWriteConfig<typeof invoiceABI, 'newInvoice'>)
+  } as UsePrepareContractWriteConfig<typeof invoiceABI, 'createInvoice'>)
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"renounceOwnership"`.
+ */
+export function usePrepareInvoiceRenounceOwnership(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof invoiceABI, 'renounceOwnership'>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return usePrepareContractWrite({
+    abi: invoiceABI,
+    functionName: 'renounceOwnership',
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof invoiceABI, 'renounceOwnership'>)
 }
 
 /**
@@ -7697,6 +7975,22 @@ export function usePrepareInvoiceSetApprovalForAll(
 }
 
 /**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"setBaseURI"`.
+ */
+export function usePrepareInvoiceSetBaseUri(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof invoiceABI, 'setBaseURI'>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return usePrepareContractWrite({
+    abi: invoiceABI,
+    functionName: 'setBaseURI',
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof invoiceABI, 'setBaseURI'>)
+}
+
+/**
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"transferFrom"`.
  */
 export function usePrepareInvoiceTransferFrom(
@@ -7710,6 +8004,22 @@ export function usePrepareInvoiceTransferFrom(
     functionName: 'transferFrom',
     ...config,
   } as UsePrepareContractWriteConfig<typeof invoiceABI, 'transferFrom'>)
+}
+
+/**
+ * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link invoiceABI}__ and `functionName` set to `"transferOwnership"`.
+ */
+export function usePrepareInvoiceTransferOwnership(
+  config: Omit<
+    UsePrepareContractWriteConfig<typeof invoiceABI, 'transferOwnership'>,
+    'abi' | 'functionName'
+  > = {} as any,
+) {
+  return usePrepareContractWrite({
+    abi: invoiceABI,
+    functionName: 'transferOwnership',
+    ...config,
+  } as UsePrepareContractWriteConfig<typeof invoiceABI, 'transferOwnership'>)
 }
 
 /**
@@ -7776,6 +8086,22 @@ export function useInvoiceBatchMetadataUpdateEvent(
 }
 
 /**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link invoiceABI}__ and `eventName` set to `"InvoiceCreated"`.
+ */
+export function useInvoiceInvoiceCreatedEvent(
+  config: Omit<
+    UseContractEventConfig<typeof invoiceABI, 'InvoiceCreated'>,
+    'abi' | 'eventName'
+  > = {} as any,
+) {
+  return useContractEvent({
+    abi: invoiceABI,
+    eventName: 'InvoiceCreated',
+    ...config,
+  } as UseContractEventConfig<typeof invoiceABI, 'InvoiceCreated'>)
+}
+
+/**
  * Wraps __{@link useContractEvent}__ with `abi` set to __{@link invoiceABI}__ and `eventName` set to `"MetadataUpdate"`.
  */
 export function useInvoiceMetadataUpdateEvent(
@@ -7789,6 +8115,22 @@ export function useInvoiceMetadataUpdateEvent(
     eventName: 'MetadataUpdate',
     ...config,
   } as UseContractEventConfig<typeof invoiceABI, 'MetadataUpdate'>)
+}
+
+/**
+ * Wraps __{@link useContractEvent}__ with `abi` set to __{@link invoiceABI}__ and `eventName` set to `"OwnershipTransferred"`.
+ */
+export function useInvoiceOwnershipTransferredEvent(
+  config: Omit<
+    UseContractEventConfig<typeof invoiceABI, 'OwnershipTransferred'>,
+    'abi' | 'eventName'
+  > = {} as any,
+) {
+  return useContractEvent({
+    abi: invoiceABI,
+    eventName: 'OwnershipTransferred',
+    ...config,
+  } as UseContractEventConfig<typeof invoiceABI, 'OwnershipTransferred'>)
 }
 
 /**

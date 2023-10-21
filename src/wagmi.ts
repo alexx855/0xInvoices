@@ -7,7 +7,8 @@ import { SCROLL_SEPOLIA_CHAIN } from '@/constants'
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
-    ...(process.env.NODE_ENV === 'development' ? [foundry] : [SCROLL_SEPOLIA_CHAIN]),
+    SCROLL_SEPOLIA_CHAIN,
+    ...(process.env.NODE_ENV === 'development' ? [foundry] : []),
   ],
   [
     publicProvider(),

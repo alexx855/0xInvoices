@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 error NotOwner();
-error EmptyEncryptedData();
+error Emptyciphertext();
 
 contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, Ownable {
     uint256 private _nextTokenId;
@@ -18,8 +18,8 @@ contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
     // Event emitted when a new invoice is created
     event InvoiceCreated(address indexed owner, uint256 indexed tokenId);
 
-    mapping(uint256 => bytes) private _encryptedData;
-    mapping(uint256 => bytes) private _encryptedKey;
+    mapping(uint256 => bytes) private _cipherText;
+    mapping(uint256 => bytes) private _dataHash;
     constructor()
         ERC721("LitInvoice", "LINV")
         Ownable(msg.sender) 
@@ -45,31 +45,31 @@ contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
             revert NotOwner();
         }
 
-        return (_encryptedData[tokenId], _encryptedKey[tokenId]);
+        return (_cipherText[tokenId], _dataHash[tokenId]);
     }
 
     // store the encrypted data for tokenId
-     function _setTokenEncryptedData(uint256 tokenId, bytes memory encryptedData) internal {
-        _encryptedData[tokenId] = encryptedData;
+     function _setTokenCipherText(uint256 tokenId, bytes memory ciphertext) internal {
+        _cipherText[tokenId] = ciphertext;
     }
 
     // store the encrypted key for tokenId
-    function _setTokenEncryptedKey(uint256 tokenId, bytes memory encryptedKey) internal {
-        _encryptedKey[tokenId] = encryptedKey;
+    function _setTokenDataHash(uint256 tokenId, bytes memory dataHash) internal {
+        _dataHash[tokenId] = dataHash;
     }
 
     // create new invoice with encrypted data
-    function createInvoice(bytes memory encryptedData, bytes memory encryptedKey) public {
-        if (encryptedData.length == 0 || encryptedKey.length == 0) {
-            revert EmptyEncryptedData();
+    function createInvoice(bytes memory ciphertext, bytes memory dataHash) public {
+        if (ciphertext.length == 0 || dataHash.length == 0) {
+            revert Emptyciphertext();
         }
         
         uint256 tokenId = _nextTokenId++;
         string memory metadataURI = string(abi.encodePacked(_baseInvoiceURI,  Strings.toString((tokenId))));
        
         _safeMint(msg.sender, tokenId);
-        _setTokenEncryptedData(tokenId, encryptedData);
-        _setTokenEncryptedKey(tokenId, encryptedKey);
+        _setTokenCipherText(tokenId, ciphertext);
+        _setTokenDataHash(tokenId, dataHash);
         _setTokenURI(tokenId, metadataURI);
 
         emit InvoiceCreated(msg.sender, tokenId);

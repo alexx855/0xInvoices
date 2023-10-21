@@ -1,3 +1,7 @@
+import { createPublicClient, http } from "viem"
+import { foundry } from "viem/chains"
+import { SCROLL_SEPOLIA_CHAIN } from "./constants"
+
 export type InvoiceStatus = "draft" | "sent" | "paid" | "void"
 
 export interface InvoiceDataItems {
@@ -28,24 +32,8 @@ export interface Invoice extends InvoiceData {
   id: string;
 }
 
-export const getInvoice = (invoiceId: string) => {
-  return fetch(`/api/invoices/${invoiceId}`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST'
-  })
-    .then(res => res.json())
-    .then(res => res.data as Invoice)
-    .catch(err => {
-      console.log(err)
-      return null
-    })
-}
-
-
 export const getInvoicesList = (address: string) => {
-  return fetch(`/api/invoices/owner/${address}`, {
+  return fetch(`${process.env.NEXT_PUBLIC_URL}/api/invoices/owner/${address}`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -59,3 +47,13 @@ export const getInvoicesList = (address: string) => {
     })
 }
 
+export const createClient = () => {
+  const chain = process.env.NODE_ENV === 'development' ? foundry : SCROLL_SEPOLIA_CHAIN
+
+  const client = createPublicClient({
+    chain,
+    transport: http()
+  })
+
+  return client
+}

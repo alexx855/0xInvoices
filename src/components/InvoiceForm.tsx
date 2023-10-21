@@ -1,10 +1,13 @@
 'use client'
 import { CONTRACT_ADDRESS, INVOICE_MOCK, ITEM_MOCK } from '@/constants';
+import { invoiceABI } from '@/generated';
 import { type InvoiceData, type InvoiceDataItems, type InvoiceStatus } from '@/invoice';
+import litInstance from '@/lit';
 import { formatAmount } from '@/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
-import { invoiceABI } from '@/generated';
+import { SiweMessage } from 'siwe';
+import { useAccount, useContractWrite, useNetwork, useSignMessage, useWaitForTransaction } from 'wagmi';
+import { stringToHex } from 'viem'
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -13,19 +16,20 @@ export function InvoiceForm({
 }: {
     invoice?: InvoiceData,
 }) {
+  const { chain } = useNetwork()
   const { address } = useAccount()
+  const { signMessageAsync } = useSignMessage()
 
-  const { config } = usePrepareContractWrite({
+  // const { write, isLoading, data } = useContractWrite(config)
+  const { write, isLoading, data } = useContractWrite({
+    chainId: chain?.id,
     address: CONTRACT_ADDRESS,
     abi: invoiceABI,
-    functionName: 'newInvoice',
-    args: [address!],
-    enabled: Boolean(address),
+    functionName: 'createInvoice',
   })
 
-  const { write, isLoading, data } = useContractWrite(config)
-
   const { isSuccess } = useWaitForTransaction({
+    chainId: chain?.id,
     hash: data?.hash,
   })
 
@@ -73,11 +77,10 @@ export function InvoiceForm({
 
     const total_unit = invoice.total_unit
     const total = getItemsTotal()
-    // const itemsData = JSON.stringify(items)
 
     const invoiceData: InvoiceData = {
       invoice_number: formValues['invoice_number'],
-      status: formValues['status'] ? formValues['status'].toLocaleLowerCase() as InvoiceStatus : 'sent',
+      status: formValues['status'] ? formValues['status'].toLowerCase() as InvoiceStatus : 'sent',
       total: total,
       total_unit: total_unit,
       client_display_name: formValues['client_display_name'],
@@ -87,24 +90,44 @@ export function InvoiceForm({
       customer_notes: formValues['customer_notes'] || ''
     }
 
-    // TODO: call contract with  encrypted invoice data
-    write?.();
+    // Create SIWE message with pre-fetched nonce and sign with wallet
+    const message = new SiweMessage({
+      domain: window.location.host,
+      address,
+      statement: 'Sign in with Ethereum to the app.',
+      uri: window.location.origin,
+      version: '1',
+      chainId: chain?.id,
+      // nonce: state.nonce,
+    })
+    const messageToSign = message.prepareMessage();
+
+    const signature = await signMessageAsync({
+      message: messageToSign,
+    })
+
+    const authSig = {
+      sig: signature,
+      derivedVia: 'web3.eth.personal.sign',
+      signedMessage: messageToSign,
+      address: address,
+    };
+
+    // Encrypt all invoice data using symmetric encryption
+    const { ciphertext, dataToEncryptHash } = await litInstance.encrypt(JSON.stringify(invoiceData), authSig)
+
+    write?.({ args: [stringToHex(ciphertext), stringToHex(dataToEncryptHash)] })
   }
 
   useEffect(() => {
     if (isSuccess && data !== undefined) {
       // TODO: display success message toast
-      console.log('Invoice created: ', data)
+      console.log('Invoice created: ', data.hash)
     }
   }, [isSuccess, data])
 
   return (
     <form ref={formRef} onSubmit={handleFormSubmit}>
-      <div>
-        {isLoading && <div>Check Wallet</div>}
-        {/* {isSuccess && <div>Transaction: {JSON.stringify(data.toString())}</div>} */}
-      </div>
-
       <div className='flex w-full sm:space-x-4 sm:flex-row flex-col justify-between'>
 
         <div className="mb-6">

@@ -1,8 +1,7 @@
 import { invoiceABI } from "@/generated"
-import { createPublicClient, http, isAddress } from "viem"
-import { CONTRACT_ADDRESS, INVOICE_MOCK, SCROLL_SEPOLIA_CHAIN } from "@/constants"
-import { Invoice } from "@/invoice"
-import { foundry } from "viem/chains"
+import { isAddress } from "viem"
+import { CONTRACT_ADDRESS, INVOICE_MOCK } from "@/constants"
+import { Invoice, createClient } from "@/invoice"
 
 interface ApiResponse {
   data: Invoice[];
@@ -25,12 +24,7 @@ export async function POST(request: Request, { params }: { params: { address: st
   try {
     // get user invoices from rpc in contract  
     const address = CONTRACT_ADDRESS
-    const chain = process.env.NODE_ENV === 'development' ? foundry : SCROLL_SEPOLIA_CHAIN
-
-    const client = createPublicClient({
-      chain,
-      transport: http()
-    })
+    const client = createClient()
 
     const balance = await client.readContract({
       address,

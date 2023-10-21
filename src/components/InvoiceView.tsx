@@ -1,16 +1,83 @@
 'use client'
-import { type Invoice } from '@/invoice'
+import { InvoiceData, type Invoice } from '@/invoice'
 import { InvoiceStatusLabel } from './InvoiceStatusLabel'
 import { formatAmount } from '@/utils'
+import { CONTRACT_ADDRESS, INVOICE_MOCK } from '@/constants'
+import { useEffect, useState } from 'react'
+import { useAccount, useContractRead, useNetwork, useSignMessage, useWalletClient } from 'wagmi'
+import { invoiceABI } from '@/generated'
+import litInstance from '@/lit';
+import { SiweMessage } from 'siwe';
+import { fromHex } from 'viem'
 
-export function InvoiceView({ invoice }: { invoice: Invoice }) {
-  // TODO: IF the owner is Connected
-  // [] TODO: add locked property, if so, load encrypted mock data and blur fields
-  console.log(invoice)
+
+export function InvoiceView({ invoiceId }: { invoiceId: string }) {
+  const { chain } = useNetwork()
+  const { address } = useAccount()
+  const { signMessageAsync } = useSignMessage()
+
+  const { data: walletClient } = useWalletClient()
+  const [invoice, setInvoice] = useState<Invoice>({
+    id: invoiceId,
+    ...INVOICE_MOCK
+  })
+
+  const [locked, setLocked] = useState<boolean>(true)
+
+  const { data, isSuccess, isError, isLoading } = useContractRead({
+    chainId: chain?.id,
+    address: CONTRACT_ADDRESS,
+    abi: invoiceABI,
+    functionName: 'getInvoiceData',
+    account: walletClient?.account,
+    args: [BigInt(invoiceId)],
+    enabled: walletClient?.account != null,
+  })
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      const ciphertext = data[0]
+      const dataHash = data[1]
+
+      async function unlockData(ciphertext: `0x${string}`, dataHash: `0x${string}`) {
+        // Create SIWE message with pre-fetched nonce and sign with wallet
+        const message = new SiweMessage({
+          domain: window.location.host,
+          address,
+          statement: 'Sign in with Ethereum to the app.',
+          uri: window.location.origin,
+          version: '1',
+          chainId: chain?.id,
+          // nonce: state.nonce,
+        })
+        const messageToSign = message.prepareMessage();
+
+        const signature = await signMessageAsync({
+          message: messageToSign,
+        })
+
+        const authSig = {
+          sig: signature,
+          derivedVia: 'web3.eth.personal.sign',
+          signedMessage: messageToSign,
+          address: address,
+        };
+        const decryptedData = await litInstance.decrypt(fromHex(ciphertext, 'string'), fromHex(dataHash, 'string'), authSig)
+        setInvoice({
+          ...JSON.parse(decryptedData)
+        })
+
+        setLocked(false)
+      }
+
+      unlockData(ciphertext, dataHash)
+    }
+  }, [address, isSuccess, chain?.id, data, signMessageAsync, invoiceId])
 
   return (
     <>
-      <div className="relative p-4 border-2 border-gray-200 border-dashed rounded-lg">
+      {/* TODO: move blur to elements */}
+      <div className={locked ? "blur-sm" : "" + "relative p-4 border-2 border-gray-200 border-dashed rounded-lg"}>
 
         <table style={{ width: '100%', tableLayout: 'fixed' }}>
           <tbody>
@@ -175,3 +242,4 @@ export function InvoiceView({ invoice }: { invoice: Invoice }) {
     </>
   )
 }
+

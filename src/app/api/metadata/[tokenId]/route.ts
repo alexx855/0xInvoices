@@ -2,7 +2,7 @@ export async function GET(request: Request) {
   const urlParts = request.url.split('/')
   const tokenId = urlParts[urlParts.length - 1]
   const invoices = {
-    "title": `Invoice #{tokenId}`,
+    "title": `Invoice #${tokenId}`,
     "type": "object",
     "properties": {
       "name": {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       },
       "image": {
         "type": "string",
-        "description": `http://localhost:3000/api/metadata/${tokenId}/image`
+        "description": `https://0x-invoices.vercel.app/api/metadata/${tokenId}/image`
       }
     }
   }
