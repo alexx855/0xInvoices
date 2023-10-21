@@ -7,7 +7,7 @@
     "build": "npm run wagmi && next build",
     "deploy:anvil": "source ./.env && forge create contracts/src/Invoice.sol:Invoice --rpc-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
     "dev": "npm run wagmi && next dev",
-    "dev:foundry": "npm run dev & wagmi generate --watch & npm run anvil",
+    "dev:foundry": "npm run dev & wagmi generate --watch",
     "start": "next start",
     "lint": "next lint",
     "wagmi": "wagmi generate"

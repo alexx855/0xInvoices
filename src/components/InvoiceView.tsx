@@ -1,14 +1,12 @@
-// 'use client'
+'use client'
 import { type Invoice } from '@/invoice'
 import { InvoiceStatusLabel } from './InvoiceStatusLabel'
 import { formatAmount } from '@/utils'
 
 export function InvoiceView({ invoice }: { invoice: Invoice }) {
   // TODO: IF the owner is Connected
-  // [] TODO: add share button
-  // [] TODO: add delete button
-  // [] TODO: add pay button
   // [] TODO: add locked property, if so, load encrypted mock data and blur fields
+  console.log(invoice)
 
   return (
     <>

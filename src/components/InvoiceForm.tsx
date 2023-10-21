@@ -1,21 +1,35 @@
 'use client'
-import { INVOICE_MOCK, ITEM_MOCK } from '@/constants';
+import { CONTRACT_ADDRESS, INVOICE_MOCK, ITEM_MOCK } from '@/constants';
 import { type InvoiceData, type InvoiceDataItems, type InvoiceStatus } from '@/invoice';
 import { formatAmount } from '@/utils';
-import { useCallback, useRef, useState } from 'react';
-import { CreateInvoiceButton } from './CreateInvoiceButton';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { invoiceABI } from '@/generated';
 
-const TEST_MODE = process.env.NODE_ENV === 'development'
+const IS_DEV = process.env.NODE_ENV === 'development'
 
 export function InvoiceForm({
   invoice = INVOICE_MOCK,
-  editMode = false,
 }: {
-  invoice?: InvoiceData,
-  editMode?: boolean,
+    invoice?: InvoiceData,
 }) {
+  const { address } = useAccount()
+
+  const { config } = usePrepareContractWrite({
+    address: CONTRACT_ADDRESS,
+    abi: invoiceABI,
+    functionName: 'newInvoice',
+    args: [address!],
+    enabled: Boolean(address),
+  })
+
+  const { write, isLoading, data } = useContractWrite(config)
+
+  const { isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
+
   const formRef = useRef<HTMLFormElement>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [items, setItems] = useState<InvoiceDataItems[]>(
     invoice?.items || [ITEM_MOCK]
   )
@@ -45,18 +59,6 @@ export function InvoiceForm({
     setItems((prev) => prev.map((item, i) => i === index ? { ...item, details: value } : item))
   }, [])
 
-  // TODO: create invoice
-  const createInvoice = async () => {
-    try {
-      setIsSubmitting(true)
-      // TODO: call contract, create invoice
-    } catch (error) {
-      // TODO: display toast
-      console.log(error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -85,45 +87,56 @@ export function InvoiceForm({
       customer_notes: formValues['customer_notes'] || ''
     }
 
-    createInvoice()
+    // TODO: call contract with  encrypted invoice data
+    write?.();
   }
+
+  useEffect(() => {
+    if (isSuccess && data !== undefined) {
+      // TODO: display success message toast
+      console.log('Invoice created: ', data)
+    }
+  }, [isSuccess, data])
 
   return (
     <form ref={formRef} onSubmit={handleFormSubmit}>
+      <div>
+        {isLoading && <div>Check Wallet</div>}
+        {/* {isSuccess && <div>Transaction: {JSON.stringify(data.toString())}</div>} */}
+      </div>
+
       <div className='flex w-full sm:space-x-4 sm:flex-row flex-col justify-between'>
 
         <div className="mb-6">
           <label htmlFor="client_display_name" className="block mb-2 text-sm font-medium text-gray-900 ">Client name <span className='text-red-900'>*</span></label>
-          <input type="client_display_name" id="client_display_name" name="client_display_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="John Doe" required defaultValue={editMode || TEST_MODE ? invoice.client_display_name : undefined} />
+          <input type="client_display_name" id="client_display_name" name="client_display_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="John Doe" required defaultValue={IS_DEV ? invoice.client_display_name : undefined} />
         </div>
         <div className="mb-6">
           <label htmlFor="invoice_number" className="block mb-2 text-sm font-medium text-gray-900 ">Invoice Number <span className='text-red-900'>*</span></label>
-          <input type="text" id="invoice_number" name="invoice_number" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required defaultValue={editMode || TEST_MODE ? invoice.invoice_number : undefined} />
+          <input type="text" id="invoice_number" name="invoice_number" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required defaultValue={IS_DEV ? invoice.invoice_number : undefined} />
         </div>
 
         <div className="mb-6 relative">
           <label htmlFor="creation_date" className="block mb-2 text-sm font-medium text-gray-900 ">Invoice date <span className='text-red-900'>*</span></label>
-          <input type="date" id="creation_date" name="creation_date" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="mm/dd/yyyy" required defaultValue={editMode || TEST_MODE ? invoice.creation_date : new Date().toISOString().split('T')[0]} />
+          <input type="date" id="creation_date" name="creation_date" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="mm/dd/yyyy" required defaultValue={IS_DEV ? invoice.creation_date : new Date().toISOString().split('T')[0]} />
         </div>
 
         <div className="mb-6 relative">
           <label htmlFor="due_date" className="block mb-2 text-sm font-medium text-gray-900 ">Due date </label>
-          <input type="date" id="due_date" name="due_date" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="mm/dd/yyyy" defaultValue={editMode || TEST_MODE ? invoice.due_date : undefined} />
+          <input type="date" id="due_date" name="due_date" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="mm/dd/yyyy" defaultValue={IS_DEV ? invoice.due_date : undefined} />
         </div>
       </div>
 
-      {editMode && (
-        <div className="mb-6">
-          <label htmlFor="status" className="block mb-2 text-sm font-medium text-gray-900 ">Status</label>
-          <select id="status" defaultValue={editMode || TEST_MODE ? invoice.status : 'draft'} name="status" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-            {['draft', 'sent', 'paid'].map((status, index) => (
-              <option key={index} value={status} >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div className="mb-6">
+        <label htmlFor="status" className="block mb-2 text-sm font-medium text-gray-900 ">Status</label>
+        <select id="status" defaultValue={IS_DEV ? invoice.status : 'draft'} name="status" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+          {['draft', 'sent', 'paid'].map((status, index) => (
+            <option key={index} value={status} >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="mb-6 relative bg-white shadow-md sm:rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -151,7 +164,7 @@ export function InvoiceForm({
                       placeholder="Software Development"
                       onChange={(e) => handleItemDetailsChange(index, e.target.value)}
                       required
-                      defaultValue={editMode || TEST_MODE ? item.details : undefined}
+                      defaultValue={IS_DEV ? item.details : undefined}
                     ></textarea>
                   </th>
                   <td className="px-4 py-3 text-right">
@@ -161,7 +174,7 @@ export function InvoiceForm({
                       className="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       step='1'
                       placeholder='0.00'
-                      required defaultValue={editMode || TEST_MODE ? item.quantity : undefined}
+                      required defaultValue={IS_DEV ? item.quantity : undefined}
                     />
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -171,7 +184,7 @@ export function InvoiceForm({
                       className="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       step='1'
                       placeholder='0.00'
-                      required defaultValue={editMode || TEST_MODE ? item.rate : undefined}
+                      required defaultValue={IS_DEV ? item.rate : undefined}
                     />
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -229,32 +242,14 @@ export function InvoiceForm({
 
       <div className="mb-6">
         <label htmlFor="Customer Notes" className="block mb-2 text-sm font-medium text-gray-900 ">Customer Notes</label>
-        <textarea id="customer_notes" name="customer_notes" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder={invoice.customer_notes} defaultValue={editMode || TEST_MODE ? invoice.customer_notes : undefined}></textarea>
+        <textarea id="customer_notes" name="customer_notes" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder={invoice.customer_notes} defaultValue={IS_DEV ? invoice.customer_notes : undefined}></textarea>
       </div>
 
-      {/* TODO: accept payment in through crypto network */}
-      {/* <div className="flex items-start mb-6">
-          <div className="flex items-center h-5">
-            <input onChange={acceptPaymentChange} id="terms" type="checkbox" value="" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" />
-          </div>
-          <label htmlFor="terms" className="cursor-pointer ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Accept the payment in <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">OETH</a></label>
-        </div> */}
-
-      <CreateInvoiceButton />
-
-      {/* <div className="flex items-start mb-6">
-        {editMode === false ? (
-          <button type="submit" name="save_and_share" value="save_and_share" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-            {isSubmitting ? 'Creating...' : 'Create'}
-          </button>
-        ) : (
-          <>
-            <button type="submit" name="update" value="update" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-              {isSubmitting ? 'Updating...' : 'Update'}
-            </button>
-          </>
-        )}
-      </div> */}
+      <div className="flex items-start mb-6">
+        <button disabled={isLoading || isSuccess || !(write !== undefined)} type="submit" name="save_and_share" value="save_and_share" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+          {isLoading || isSuccess ? 'Creating...' : 'Create'}
+        </button>
+      </div>
     </form>
   )
 }

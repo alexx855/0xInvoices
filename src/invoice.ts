@@ -29,7 +29,7 @@ export interface Invoice extends InvoiceData {
 }
 
 export const getInvoice = (invoiceId: string) => {
-  return fetch(`http://localhost:3000/api/invoices/${invoiceId}`, {
+  return fetch(`/api/invoices/${invoiceId}`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -37,11 +37,15 @@ export const getInvoice = (invoiceId: string) => {
   })
     .then(res => res.json())
     .then(res => res.data as Invoice)
+    .catch(err => {
+      console.log(err)
+      return null
+    })
 }
 
 
-export const getInvoicesList = () => {
-  return fetch(`http://localhost:3000/api/invoices`, {
+export const getInvoicesList = (address: string) => {
+  return fetch(`/api/invoices/owner/${address}`, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -49,5 +53,9 @@ export const getInvoicesList = () => {
   })
     .then(res => res.json())
     .then(res => res.data as Invoice[])
+    .catch(err => {
+      console.log(err)
+      return []
+    })
 }
 

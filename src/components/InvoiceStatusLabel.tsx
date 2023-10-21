@@ -1,6 +1,6 @@
 import { InvoiceStatus } from "@/invoice"
 
-export const InvoiceStatusLabel = ({ status }: { status: InvoiceStatus }): JSX.Element => {
+export const InvoiceStatusLabel = ({ status }: { status: InvoiceStatus }) => {
   switch (status) {
     case 'draft':
       return (

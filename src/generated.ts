@@ -69,7 +69,7 @@ export const counterABI = [
  * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234)
  */
 export const counterAddress = {
-  31337: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+  31337: '0x3489745eff9525CCC3d8c648102FE2cf3485e228',
   534351: '0x93D7B1a473088cCea249Eb02e8eA5B0b43Bd1234',
 } as const
 

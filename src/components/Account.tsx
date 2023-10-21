@@ -1,25 +1,24 @@
 'use client'
 
-import { useInvoiceBalanceOf } from '@/generated'
-import { useAccount } from 'wagmi'
+
+import { useAccount, useBalance } from 'wagmi'
 
 export function Account() {
   const { address } = useAccount()
+
+  const { data, isError, isLoading } = useBalance({
+    address,
+  })
+
   if (!address) {
     throw new Error('No address')
   }
-
-  const { data } = useInvoiceBalanceOf({
-    args: [
-      address!
-    ],
-  })
 
   return (
     <div>
       {address}
       <hr />
-      Account 0xInvoices: <span>{data?.toString() || '0'}</span>
+      Balance: <span>{data?.formatted} {data?.symbol}</span>
     </div>
   )
 }
