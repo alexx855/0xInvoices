@@ -33,7 +33,7 @@ export function InvoiceList() {
         const data = await getInvoicesList(address!)
         const invoices: Invoice[] = []
 
-        if (!data.length || !authSig) {
+        if (!data || !data.length || !authSig) {
           setInvoices([])
           setisLoading(false)
           return
