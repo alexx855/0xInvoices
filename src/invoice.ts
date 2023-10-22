@@ -1,7 +1,10 @@
-import { createPublicClient, http } from "viem"
+import { createPublicClient, fromHex, http } from "viem"
 import { foundry } from "viem/chains"
-import { SCROLL_SEPOLIA_CHAIN } from "./constants"
+import { CONTRACT_ADDRESS, SCROLL_SEPOLIA_CHAIN } from "./constants"
 import { ApiOwnerResponse } from "./app/api/invoices/owner/[address]/route"
+import litInstance from "./lit"
+import { ApiInvoiceResponse } from "./app/api/invoices/[invoiceId]/route"
+import { invoiceABI } from "./generated"
 
 export type InvoiceStatus = "draft" | "sent" | "paid" | "void"
 
@@ -16,6 +19,12 @@ export interface InvoiceStorage {
   id?: string;
   ciphertext: string;
   dataToEncryptHash: string;
+}
+
+export interface InvoiceEncryptedData {
+  tokenId: string;
+  ciphertext: `0x${string}`;
+  dataHash: `0x${string}`;
 }
 
 export interface InvoiceData {
@@ -38,13 +47,29 @@ export const getInvoicesList = (address: string) => {
     headers: {
       'Content-Type': 'application/json'
     },
-    method: 'POST'
+    cache: 'no-store',
+    method: 'POST',
   })
     .then(res => res.json())
     .then(res => (res as ApiOwnerResponse).data)
     .catch(err => {
       console.log(err)
-      return []
+    })
+}
+export const getInvoice = async (tokenId: string, authSig: `0x${string}`) => {
+  return fetch(`${process.env.NEXT_PUBLIC_URL}/api/invoices/${tokenId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': authSig
+    },
+    cache: 'no-store',
+    body: authSig,
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then(res => (res as ApiInvoiceResponse).data)
+    .catch(err => {
+      console.log(err)
     })
 }
 

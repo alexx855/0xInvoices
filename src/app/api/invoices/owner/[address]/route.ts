@@ -1,13 +1,8 @@
 import { invoiceABI } from "@/generated"
 import { isAddress } from "viem"
 import { CONTRACT_ADDRESS } from "@/constants"
-import { createClient } from "@/invoice"
+import { InvoiceEncryptedData, createClient } from "@/invoice"
 
-interface InvoiceEncryptedData {
-  tokenId: string;
-  ciphertext: `0x${string}`;
-  dataHash: `0x${string}`;
-}
 export interface ApiOwnerResponse {
   data: InvoiceEncryptedData[];
 }

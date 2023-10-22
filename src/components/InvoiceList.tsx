@@ -13,7 +13,7 @@ import { DeleteInvoiceButton } from './DeleteInvoiceButton';
 import { toast } from 'sonner'
 import { SCROLL_SEPOLIA_CHAIN } from '@/constants';
 import litInstance from '@/lit';
-import { fromHex, isAddress } from 'viem';
+import { fromHex, isAddress, toHex } from 'viem';
 import { AuthSigContext } from '@/context';
 
 export function InvoiceList() {

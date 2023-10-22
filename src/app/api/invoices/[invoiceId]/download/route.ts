@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server"
-import { readFileSync } from 'fs';
-import path from 'path';
+import puppeteer from 'puppeteer'
 
 export async function GET(request: Request) {
-  // get ?force from query
-  const force = request.url.includes('?force')
+  try {
+    const force = request.url.includes('?force')
+    const browser = await puppeteer.launch({ ignoreDefaultArgs: ['--disable-extensions'] })
+    const page = await browser.newPage()
+    await page.goto(request.url.replace('/api', '').replace('/download', '/pdf'))
+    await page.emulateMediaType('screen')
+    const pdfBuffer = await page.pdf({ format: 'A4' })
+    await browser.close()
+    // return image as response
+    const response = new NextResponse(pdfBuffer, {
+      headers: {
+        'Content-Type': ' application/pdf',
+        'Content-Disposition': force ? 'attachment; filename="invoice_test.pdf"' : 'inline',
+      },
+    })
+    return response
+  } catch (error) {
+    console.log(error)
+    return new NextResponse(null, {
+      status: 500,
+      statusText: 'Internal Server Error',
+    })
+  }
 
-  // load image from file system
-  const imagePath = path.join(process.cwd(), 'public', 'invoice_test.pdf');
-  const imageBuffer = readFileSync(imagePath);
-
-  // return image as response
-  const response = new NextResponse(imageBuffer.buffer, {
-    headers: {
-      'Content-Type': ' application/pdf',
-      'Content-Disposition': force ? 'attachment; filename="invoice_test.pdf"' : 'inline',
-    },
-  })
-
-  return response
 }

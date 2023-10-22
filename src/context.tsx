@@ -63,7 +63,7 @@ export function AuthSigProvider({ children }: { children: React.ReactNode }) {
 
       getAuthSig();
     }
-  }, [address, isConnected])
+  }, [address, authSig, chain?.id, isConnected, signMessageAsync])
 
   return (
     <AuthSigContext.Provider value={authSig}>

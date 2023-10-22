@@ -23,7 +23,7 @@ import {
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export const counterABI = [
   {
@@ -66,16 +66,16 @@ export const counterABI = [
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export const counterAddress = {
-  31337: '0x32cd5ecdA7f2B8633C00A0434DE28Db111E60636',
-  534351: '0xb919a198AA539EAD877Ba25C9eb51639d6368a64',
+  31337: '0xbeC6419cD931e29ef41157fe24C6928a0C952f0b',
+  534351: '0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884',
 } as const
 
 /**
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export const counterConfig = {
   address: counterAddress,
@@ -2723,7 +2723,7 @@ export const testABI = [
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterRead<
   TFunctionName extends string,
@@ -2748,7 +2748,7 @@ export function useCounterRead<
  * Wraps __{@link useContractRead}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"number"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterNumber<
   TFunctionName extends 'number',
@@ -2774,7 +2774,7 @@ export function useCounterNumber<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterWrite<
   TFunctionName extends string,
@@ -2807,7 +2807,7 @@ export function useCounterWrite<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"increment"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterIncrement<
   TMode extends WriteContractMode = undefined,
@@ -2844,7 +2844,7 @@ export function useCounterIncrement<
  * Wraps __{@link useContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"setNumber"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterSetNumber<
   TMode extends WriteContractMode = undefined,
@@ -2881,7 +2881,7 @@ export function useCounterSetNumber<
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function usePrepareCounterWrite<TFunctionName extends string>(
   config: Omit<
@@ -2903,7 +2903,7 @@ export function usePrepareCounterWrite<TFunctionName extends string>(
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"increment"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function usePrepareCounterIncrement(
   config: Omit<
@@ -2926,7 +2926,7 @@ export function usePrepareCounterIncrement(
  * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link counterABI}__ and `functionName` set to `"setNumber"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function usePrepareCounterSetNumber(
   config: Omit<
@@ -2949,7 +2949,7 @@ export function usePrepareCounterSetNumber(
  * Wraps __{@link useContractEvent}__ with `abi` set to __{@link counterABI}__.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterEvent<TEventName extends string>(
   config: Omit<
@@ -2971,7 +2971,7 @@ export function useCounterEvent<TEventName extends string>(
  * Wraps __{@link useContractEvent}__ with `abi` set to __{@link counterABI}__ and `eventName` set to `"Transfer"`.
  *
  * -
- * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
+ * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0x0dD41926367E50C5f8B62A9FEb96a7f34Df4E884)
  */
 export function useCounterTransferEvent(
   config: Omit<
