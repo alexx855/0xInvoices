@@ -1,20 +1,21 @@
 'use client'
-import { InvoiceData, type Invoice } from '@/invoice'
+import { type Invoice } from '@/invoice'
 import { InvoiceStatusLabel } from './InvoiceStatusLabel'
 import { formatAmount } from '@/utils'
 import { CONTRACT_ADDRESS, INVOICE_MOCK } from '@/constants'
-import { useEffect, useState } from 'react'
-import { useAccount, useContractRead, useNetwork, useSignMessage, useWalletClient } from 'wagmi'
+import { useContext, useEffect, useState } from 'react'
+import { useContractRead, useNetwork, useWalletClient } from 'wagmi'
 import { invoiceABI } from '@/generated'
 import litInstance from '@/lit';
-import { SiweMessage } from 'siwe';
 import { fromHex } from 'viem'
-
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { AuthSigContext } from '@/context'
 
 export function InvoiceView({ invoiceId }: { invoiceId: string }) {
+  const authSig = useContext(AuthSigContext);
   const { chain } = useNetwork()
-  const { address } = useAccount()
-  const { signMessageAsync } = useSignMessage()
+  const router = useRouter();
 
   const { data: walletClient } = useWalletClient()
   const [invoice, setInvoice] = useState<Invoice>({
@@ -24,14 +25,14 @@ export function InvoiceView({ invoiceId }: { invoiceId: string }) {
 
   const [locked, setLocked] = useState<boolean>(true)
 
-  const { data, isSuccess, isError, isLoading } = useContractRead({
+  const { data, isSuccess, isError, error, isLoading } = useContractRead({
     chainId: chain?.id,
     address: CONTRACT_ADDRESS,
     abi: invoiceABI,
     functionName: 'getInvoiceData',
-    account: walletClient?.account,
+    // account: walletClient?.account,
     args: [BigInt(invoiceId)],
-    enabled: walletClient?.account != null,
+    enabled: walletClient?.account != null && chain?.id != null,
   })
 
   useEffect(() => {
@@ -41,54 +42,62 @@ export function InvoiceView({ invoiceId }: { invoiceId: string }) {
 
       async function unlockData(ciphertext: `0x${string}`, dataHash: `0x${string}`) {
         // Create SIWE message with pre-fetched nonce and sign with wallet
-        const message = new SiweMessage({
-          domain: window.location.host,
-          address,
-          statement: 'Sign in with Ethereum to the app.',
-          uri: window.location.origin,
-          version: '1',
-          chainId: chain?.id,
-          // nonce: state.nonce,
-        })
-        const messageToSign = message.prepareMessage();
 
-        const signature = await signMessageAsync({
-          message: messageToSign,
-        })
+        try {
+          const decryptedData = await litInstance.decrypt(fromHex(ciphertext, 'string'), fromHex(dataHash, 'string'), authSig)
+          setInvoice({
+            ...JSON.parse(decryptedData)
+          })
 
-        const authSig = {
-          sig: signature,
-          derivedVia: 'web3.eth.personal.sign',
-          signedMessage: messageToSign,
-          address: address,
-        };
-        const decryptedData = await litInstance.decrypt(fromHex(ciphertext, 'string'), fromHex(dataHash, 'string'), authSig)
-        setInvoice({
-          ...JSON.parse(decryptedData)
-        })
+          setLocked(false)
 
-        setLocked(false)
+        } catch (error: any) {
+          // User denied message signature error.details
+          if (error?.details?.includes('User denied message signature')) {
+            const action = {
+              label: 'Back',
+              onClick: () => router.push('/')
+            }
+            toast.error('You need to sign the message to view the invoice', { action, duration: 10000 })
+          }
+        }
       }
 
       unlockData(ciphertext, dataHash)
     }
-  }, [address, isSuccess, chain?.id, data, signMessageAsync, invoiceId])
+  }, [authSig, data, isSuccess, router])
+
+  useEffect(() => {
+    if (isError) {
+      const action = {
+        label: 'Back',
+        onClick: () => router.push('/')
+      }
+
+      if (error?.message?.includes('ERC721NonexistentToken')) {
+        toast.error('Invoice does not exist', { action, duration: 10000 })
+      } else if (error?.message?.includes('ERC721NonexistentToken')) {
+        toast.error('Invoice does not exist', { action, duration: 10000 })
+      } else {
+        toast.error('Error fetching invoice data', { action, duration: 10000 })
+      }
+      console.log(error?.message)
+    }
+  }, [isError, error, router])
 
   return (
     <>
-      {/* TODO: move blur to elements */}
-      <div className={locked ? "blur-sm" : "" + "relative p-4 border-2 border-gray-200 border-dashed rounded-lg"}>
-
+      <div className={locked ? "blur-sm animate-pulse animation-delay-1000" : "" + "relative p-4 border-2 border-gray-200 border-dashed rounded-lg"}>
         <table style={{ width: '100%', tableLayout: 'fixed' }}>
           <tbody>
             <tr>
               <td style={{ verticalAlign: 'top', width: '50%' }}>
                 <div>
                 </div>
-                <span><b>TODO: user.display_name || address</b></span><br />
+                {/* <span><b>TODO: user.display_name || address</b></span><br /> */}
                 <span>
                   <span style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-                    TODO: user.additional_info
+                    {/* TODO: user.additional_info */}
                   </span>
                 </span>
               </td>

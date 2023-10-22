@@ -69,7 +69,7 @@ export const counterABI = [
  * - [__View Contract on Scroll Sepolia Blockscout__](https://sepolia-blockscout.scroll.io/address/0xb919a198AA539EAD877Ba25C9eb51639d6368a64)
  */
 export const counterAddress = {
-  31337: '0x55027d3dBBcEA0327eF73eFd74ba0Af42A13A966',
+  31337: '0x32cd5ecdA7f2B8633C00A0434DE28Db111E60636',
   534351: '0xb919a198AA539EAD877Ba25C9eb51639d6368a64',
 } as const
 
@@ -2037,7 +2037,6 @@ export const invoiceABI = [
     name: 'ERC721OutOfBoundsIndex',
   },
   { type: 'error', inputs: [], name: 'Emptyciphertext' },
-  { type: 'error', inputs: [], name: 'NotOwner' },
   {
     type: 'error',
     inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
@@ -2210,7 +2209,7 @@ export const invoiceABI = [
       { name: 'dataHash', internalType: 'bytes', type: 'bytes' },
     ],
     name: 'createInvoice',
-    outputs: [],
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
   },
   {
     stateMutability: 'view',

@@ -1,6 +1,7 @@
 import { createPublicClient, http } from "viem"
 import { foundry } from "viem/chains"
 import { SCROLL_SEPOLIA_CHAIN } from "./constants"
+import { ApiOwnerResponse } from "./app/api/invoices/owner/[address]/route"
 
 export type InvoiceStatus = "draft" | "sent" | "paid" | "void"
 
@@ -40,7 +41,7 @@ export const getInvoicesList = (address: string) => {
     method: 'POST'
   })
     .then(res => res.json())
-    .then(res => res.data as Invoice[])
+    .then(res => (res as ApiOwnerResponse).data)
     .catch(err => {
       console.log(err)
       return []

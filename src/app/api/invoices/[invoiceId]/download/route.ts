@@ -7,14 +7,14 @@ export async function GET(request: Request) {
   const force = request.url.includes('?force')
 
   // load image from file system
-  const imagePath = path.join(process.cwd(), 'public', 'image_test.png');
+  const imagePath = path.join(process.cwd(), 'public', 'invoice_test.pdf');
   const imageBuffer = readFileSync(imagePath);
 
   // return image as response
   const response = new NextResponse(imageBuffer.buffer, {
     headers: {
-      'Content-Type': 'image/png',
-      'Content-Disposition': force ? 'attachment; filename="image_test.png"' : 'inline',
+      'Content-Type': ' application/pdf',
+      'Content-Disposition': force ? 'attachment; filename="invoice_test.pdf"' : 'inline',
     },
   })
 

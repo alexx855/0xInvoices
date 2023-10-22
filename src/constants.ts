@@ -2,7 +2,7 @@ import { type Chain } from 'wagmi'
 import { InvoiceData, InvoiceDataItems } from './invoice'
 import { foundry } from 'viem/chains'
 
-export const FOUNDRY_CONTRACT_ADDRESS = '0x55027d3dBBcEA0327eF73eFd74ba0Af42A13A966'
+export const FOUNDRY_CONTRACT_ADDRESS = '0x32cd5ecdA7f2B8633C00A0434DE28Db111E60636'
 export const SCROLL_CONTRACT_ADDRESS = '0xb919a198AA539EAD877Ba25C9eb51639d6368a64'
 export const CONTRACT_ADDRESS = process.env.NODE_ENV === 'development' ? FOUNDRY_CONTRACT_ADDRESS : SCROLL_CONTRACT_ADDRESS
 

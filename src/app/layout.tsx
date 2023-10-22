@@ -1,6 +1,8 @@
 import './globals.css'
+// import 'flowbite';
 
 import { Providers } from './providers'
+import { Layout } from '@/components/Layout';
 
 export const metadata = {
   title: 'wagmi',
@@ -14,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Layout>{children}</Layout>
+        </Providers>
       </body>
     </html>
   )

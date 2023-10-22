@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-error NotOwner();
+// error NotOwner();
 error Emptyciphertext();
 
 contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, Ownable {
@@ -40,10 +40,10 @@ contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
 
     // return encrypted data and key for tokenId
     function getInvoiceData(uint256 tokenId) public view returns  (bytes memory, bytes memory) {
-        // only the owner can view the data
-        if (msg.sender != ownerOf(tokenId)) {
-            revert NotOwner();
-        }
+        // // only the owner can view the data
+        // if (msg.sender != ownerOf(tokenId)) {
+        //     revert NotOwner();
+        // }
 
         return (_cipherText[tokenId], _dataHash[tokenId]);
     }
@@ -59,7 +59,7 @@ contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
     }
 
     // create new invoice with encrypted data
-    function createInvoice(bytes memory ciphertext, bytes memory dataHash) public {
+    function createInvoice(bytes memory ciphertext, bytes memory dataHash) public returns (uint256) {
         if (ciphertext.length == 0 || dataHash.length == 0) {
             revert Emptyciphertext();
         }
@@ -73,6 +73,9 @@ contract Invoice is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, 
         _setTokenURI(tokenId, metadataURI);
 
         emit InvoiceCreated(msg.sender, tokenId);
+
+        // return the tokenId so the caller can query it later from the event logs
+        return tokenId;
     }
 
     // The following functions are overrides required by Solidity.

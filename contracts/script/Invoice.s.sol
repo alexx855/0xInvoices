@@ -12,21 +12,10 @@ contract InvoiceScript is Script {
     function run() public {
         vm.startBroadcast();
         new Invoice();
+
+        // Send some eth to these test address 
+        vm.deal(address(0xc120A2aB2bE848F334E5777A7A4600d899aBC956), 1 ether);
+        vm.deal(address(0xbE8727E5e87aFc90F3fdA82b37fA4062d52c5e35), 1 ether);
         vm.stopBroadcast();
-
-        // vm.prank(address(vm.addr(1)));
-        // invoice.newInvoice(address(vm.addr(1)));
-
-        // vm.prank(address(vm.addr(2)));
-        // invoice.newInvoice(address(vm.addr(2)));
-
-        // address testAddress = address(
-        //     0x0c4773Cc8aBd313F83686DB0eD6c947A7Fef01c6
-        // );
-        // // send eth to test address
-        // vm.deal(testAddress, 1 ether);
-
-        // // vm.prank(address(vm.addr(2)));
-        // invoice.newInvoice(testAddress);
     }
 }

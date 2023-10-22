@@ -1,10 +1,15 @@
 import { invoiceABI } from "@/generated"
 import { isAddress } from "viem"
-import { CONTRACT_ADDRESS, INVOICE_MOCK } from "@/constants"
-import { Invoice, createClient } from "@/invoice"
+import { CONTRACT_ADDRESS } from "@/constants"
+import { createClient } from "@/invoice"
 
-interface ApiResponse {
-  data: Invoice[];
+interface InvoiceEncryptedData {
+  tokenId: string;
+  ciphertext: `0x${string}`;
+  dataHash: `0x${string}`;
+}
+export interface ApiOwnerResponse {
+  data: InvoiceEncryptedData[];
 }
 
 // opt out of caching for a specific route segment
@@ -19,7 +24,7 @@ export async function POST(request: Request, { params }: { params: { address: st
   }
 
   const ownerAddress: `0x${string}` = params.address;
-  const invoices: Invoice[] = []
+  const data: InvoiceEncryptedData[] = []
 
   try {
     // get user invoices from rpc in contract  
@@ -43,9 +48,17 @@ export async function POST(request: Request, { params }: { params: { address: st
           args: [ownerAddress, BigInt(i)]
         })
 
-        invoices.push({
-          id: tokenId.toString(),
-          ...INVOICE_MOCK
+        const [ciphertext, dataHash] = await client.readContract({
+          address,
+          abi: invoiceABI,
+          functionName: 'getInvoiceData',
+          args: [tokenId]
+        })
+
+        data.push({
+          tokenId: tokenId.toString(),
+          ciphertext,
+          dataHash
         })
       }
     }
@@ -54,8 +67,6 @@ export async function POST(request: Request, { params }: { params: { address: st
     console.log(error)
   }
 
-  const res: ApiResponse = { data: invoices }
-
+  const res: ApiOwnerResponse = { data }
   return Response.json(res)
-
 }

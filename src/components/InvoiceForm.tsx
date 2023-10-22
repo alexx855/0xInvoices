@@ -4,21 +4,25 @@ import { invoiceABI } from '@/generated';
 import { type InvoiceData, type InvoiceDataItems, type InvoiceStatus } from '@/invoice';
 import litInstance from '@/lit';
 import { formatAmount } from '@/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { SiweMessage } from 'siwe';
-import { useAccount, useContractWrite, useNetwork, useSignMessage, useWaitForTransaction } from 'wagmi';
-import { stringToHex } from 'viem'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useAccount, useContractWrite, useNetwork, useWaitForTransaction } from 'wagmi';
+import { fromHex, stringToHex } from 'viem'
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { AuthSigContext } from '@/context';
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
 export function InvoiceForm({
   invoice = INVOICE_MOCK,
 }: {
+
     invoice?: InvoiceData,
 }) {
+  const authSig = useContext(AuthSigContext);
   const { chain } = useNetwork()
-  const { address } = useAccount()
-  const { signMessageAsync } = useSignMessage()
+  const { isConnected } = useAccount()
+  const router = useRouter();
 
   // const { write, isLoading, data } = useContractWrite(config)
   const { write, isLoading, data } = useContractWrite({
@@ -28,9 +32,10 @@ export function InvoiceForm({
     functionName: 'createInvoice',
   })
 
-  const { isSuccess } = useWaitForTransaction({
+  const { isSuccess, isLoading: isLoadingTx, data: dataTx } = useWaitForTransaction({
     chainId: chain?.id,
     hash: data?.hash,
+    confirmations: 1,
   })
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -66,7 +71,7 @@ export function InvoiceForm({
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!formRef.current) return;
+    if (!formRef.current || !isConnected || !chain || !write || isLoading || isLoadingTx) return
 
     // Get form data
     const formData = new FormData(formRef.current);
@@ -90,41 +95,36 @@ export function InvoiceForm({
       customer_notes: formValues['customer_notes'] || ''
     }
 
-    // Create SIWE message with pre-fetched nonce and sign with wallet
-    const message = new SiweMessage({
-      domain: window.location.host,
-      address,
-      statement: 'Sign in with Ethereum to the app.',
-      uri: window.location.origin,
-      version: '1',
-      chainId: chain?.id,
-      // nonce: state.nonce,
-    })
-    const messageToSign = message.prepareMessage();
+    try {
+      // Encrypt all invoice data using symmetric encryption
+      const { ciphertext, dataToEncryptHash } = await litInstance.encrypt(JSON.stringify(invoiceData), authSig)
+      write({ args: [stringToHex(ciphertext), stringToHex(dataToEncryptHash)] })
 
-    const signature = await signMessageAsync({
-      message: messageToSign,
-    })
-
-    const authSig = {
-      sig: signature,
-      derivedVia: 'web3.eth.personal.sign',
-      signedMessage: messageToSign,
-      address: address,
-    };
-
-    // Encrypt all invoice data using symmetric encryption
-    const { ciphertext, dataToEncryptHash } = await litInstance.encrypt(JSON.stringify(invoiceData), authSig)
-
-    write?.({ args: [stringToHex(ciphertext), stringToHex(dataToEncryptHash)] })
-  }
-
-  useEffect(() => {
-    if (isSuccess && data !== undefined) {
-      // TODO: display success message toast
-      console.log('Invoice created: ', data.hash)
+    } catch (error: any) {
+      console.log(error)
+      // User denied message signature error.details
+      if (error?.details?.includes('User denied message signature')) {
+        toast.error('You need to sign the message to encrypt the invoice data', { duration: 10000 })
+      } else {
+        toast.error('Something went wrong', { duration: 10000 })
+      }
     }
-  }, [isSuccess, data])
+  }
+  useEffect(() => {
+    if (isSuccess && dataTx !== undefined) {
+      console.log('Invoice created: ', dataTx)
+      // Get invoice id from event logs
+      const invoiceId = fromHex(dataTx.logs[1].data, 'number')
+
+      toast('Invoice created', {
+        action: {
+          label: 'View invoice',
+          onClick: () => router.push(`/invoices/${invoiceId}`)
+        },
+        duration: 5000
+      })
+    }
+  }, [dataTx, isSuccess, router])
 
   return (
     <form ref={formRef} onSubmit={handleFormSubmit}>
@@ -268,10 +268,15 @@ export function InvoiceForm({
         <textarea id="customer_notes" name="customer_notes" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder={invoice.customer_notes} defaultValue={IS_DEV ? invoice.customer_notes : undefined}></textarea>
       </div>
 
+      {!isConnected && <div className="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+        <span className="font-medium">Please sign in to create invoice</span>
+      </div>}
+
       <div className="flex items-start mb-6">
-        <button disabled={isLoading || isSuccess || !(write !== undefined)} type="submit" name="save_and_share" value="save_and_share" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-          {isLoading || isSuccess ? 'Creating...' : 'Create'}
+        <button disabled={!isConnected || !chain || !(write !== undefined)} type="submit" name="create" value="create" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+          {isLoading || isLoadingTx ? 'Creating...' : 'Create'}
         </button>
+
       </div>
     </form>
   )

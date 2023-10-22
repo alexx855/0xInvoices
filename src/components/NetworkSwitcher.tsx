@@ -1,8 +1,7 @@
 'use client'
 
-import { BaseError } from 'viem'
+// import { BaseError } from 'viem'
 import { useNetwork, useSwitchNetwork } from 'wagmi'
-import { SignOut } from './SignOut'
 
 export function NetworkSwitcher() {
   const { chain } = useNetwork()
@@ -10,28 +9,26 @@ export function NetworkSwitcher() {
     useSwitchNetwork()
 
   return (
-    <div>
-      <div>
-        Connected to {chain?.name ?? chain?.id}
-        {chain?.unsupported && ' (unsupported)'}
-      </div>
-
+    <>
       {switchNetwork && (
-        <div>
+        <>
           {chains.map((x) =>
             x.id === chain?.id ? null : (
-              <button key={x.id} onClick={() => switchNetwork(x.id)}>
-                {x.name}
+              <button className='p-2 text-left' key={x.id} onClick={() => switchNetwork(x.id)}>
+                Switch to  {x.name}
                 {isLoading && x.id === pendingChainId && ' (switching)'}
               </button>
             ),
           )}
-        </div>
+        </>
       )}
 
-      <SignOut />
+      {/* <p className="p-2  text-gray-900 rounded-lg">
+        Connected to {chain?.name ?? chain?.id}
+        {chain?.unsupported && ' (unsupported)'}
+      </p> */}
 
-      <div>{error && (error as BaseError).shortMessage}</div>
-    </div>
+      {/* <p>{error && (error as BaseError).shortMessage}</p> */}
+    </>
   )
 }
