@@ -1,6 +1,9 @@
-<!-- TODO: complete readme  -->
+# 📜 0xInvoices
 
-### Run the app locally
+Free invoice generator. Create secureand private invoices using lit protocol at low-cost on scroll network.
+
+## Run the app locally
+
 ```bash
 npm install
 npm run anvil
